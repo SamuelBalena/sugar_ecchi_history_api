@@ -1,0 +1,13 @@
+import cors from "cors";
+import express from "express";
+import swaggerUi from "swagger-ui-express";
+import { openapi } from "./docs/openapi.js";
+import { errorHandler, notFound } from "./middlewares/error.middleware.js";
+import { apiRouter } from "./routes/api.routes.js";
+export const app = express();
+app.use(cors({ origin: process.env.FRONTEND_ORIGIN?.split(",") ?? true }));
+app.use(express.json({ limit: "1mb" }));
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
+app.get("/api-docs.json", (_req, res) => res.json(openapi));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapi));
+app.use("/api/v1", apiRouter); app.use(notFound); app.use(errorHandler);
